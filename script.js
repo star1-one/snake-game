@@ -619,6 +619,25 @@ function drawGrid() {
 function drawSnake() {
   const skin = getActiveSkin();
   state.snake.forEach((segment, index) => {
+    if (headImage.complete) {
+      const padding = 1;
+      const size = GRID_SIZE - padding * 2;
+      const px = segment.x * GRID_SIZE + padding;
+      const py = segment.y * GRID_SIZE + padding;
+      if (index === 0) {
+        state.headAngle = lerpAngle(state.headAngle, state.targetAngle, 0.25);
+        const angle = state.headAngle;
+        ctx.save();
+        ctx.translate(px + size / 2, py + size / 2);
+        ctx.rotate(angle);
+        ctx.drawImage(headImage, -size / 2, -size / 2, size, size);
+        ctx.restore();
+      } else {
+        ctx.drawImage(headImage, px, py, size, size);
+      }
+      return;
+    }
+
     let color = index === 0 ? skin.head : skin.body;
     let radius = index === 0 ? 8 : 6;
     if (skin.style === "pixel") {
@@ -627,22 +646,6 @@ function drawSnake() {
       const rainbow = ["#ff6b6b", "#ffd93d", "#4cc9f0", "#5efc8d", "#b5179e"];
       color = rainbow[index % rainbow.length];
     }
-
-    if (index === 0 && headImage.complete) {
-      const padding = 1;
-      const size = GRID_SIZE - padding * 2;
-      const px = segment.x * GRID_SIZE + padding + size / 2;
-      const py = segment.y * GRID_SIZE + padding + size / 2;
-      state.headAngle = lerpAngle(state.headAngle, state.targetAngle, 0.25);
-      const angle = state.headAngle;
-      ctx.save();
-      ctx.translate(px, py);
-      ctx.rotate(angle);
-      ctx.drawImage(headImage, -size / 2, -size / 2, size, size);
-      ctx.restore();
-      return;
-    }
-
     drawCell(segment.x, segment.y, color, radius);
   });
 }
