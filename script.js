@@ -1,19 +1,28 @@
 const GRID_SIZE = 20;
 const CELL_COUNT = 20;
-const TICK_MS = 120;
+const BASE_TICK_MS = 140;
+const MIN_TICK_MS = 70;
+const LEVEL_SCORE_STEP = 50;
 
 const board = document.getElementById("board");
 const ctx = board.getContext("2d");
 const scoreEl = document.getElementById("score");
+const levelEl = document.getElementById("level");
 const bestEl = document.getElementById("best");
 const overlay = document.getElementById("overlay");
 const overlayTitle = document.getElementById("overlay-title");
 const overlaySubtitle = document.getElementById("overlay-subtitle");
 const startBtn = document.getElementById("start-btn");
+const newBtn = document.getElementById("new-btn");
+const continueBtn = document.getElementById("continue-btn");
+const resetBtn = document.getElementById("reset-btn");
+const menuActions = document.getElementById("menu-actions");
+const statusActions = document.getElementById("status-actions");
 const pauseBtn = document.getElementById("pause-btn");
 const restartBtn = document.getElementById("restart-btn");
 
 const bestScoreKey = "snake.bestScore";
+const bestLevelKey = "snake.bestLevel";
 
 const directionMap = {
   ArrowUp: { x: 0, y: -1 },
@@ -32,6 +41,7 @@ const state = {
   pendingDirection: { x: 1, y: 0 },
   food: { x: 0, y: 0 },
   score: 0,
+  level: 1,
   running: false,
   paused: false,
   gameOver: false,
@@ -47,7 +57,16 @@ function setBestScore(value) {
   localStorage.setItem(bestScoreKey, String(value));
 }
 
-function resetState() {
+function getBestLevel() {
+  const stored = Number(localStorage.getItem(bestLevelKey));
+  return Number.isFinite(stored) && stored > 0 ? stored : 1;
+}
+
+function setBestLevel(value) {
+  localStorage.setItem(bestLevelKey, String(value));
+}
+
+function resetState(startLevel) {
   state.snake = [
     { x: 6, y: 10 },
     { x: 5, y: 10 },
@@ -55,7 +74,8 @@ function resetState() {
   ];
   state.direction = { x: 1, y: 0 };
   state.pendingDirection = { x: 1, y: 0 };
-  state.score = 0;
+  state.level = startLevel;
+  state.score = (startLevel - 1) * LEVEL_SCORE_STEP;
   state.running = false;
   state.paused = false;
   state.gameOver = false;
@@ -65,18 +85,32 @@ function resetState() {
 
 function updateScore() {
   scoreEl.textContent = String(state.score);
+  levelEl.textContent = String(state.level);
   const best = Math.max(getBestScore(), state.score);
   bestEl.textContent = String(best);
   if (state.score > getBestScore()) {
     setBestScore(state.score);
   }
+  if (state.level > getBestLevel()) {
+    setBestLevel(state.level);
+  }
 }
 
-function setOverlay(title, subtitle, showButton = true) {
+function setOverlay(title, subtitle, showMenu = false) {
   overlayTitle.textContent = title;
   overlaySubtitle.textContent = subtitle;
-  startBtn.style.display = showButton ? "inline-flex" : "none";
+  if (showMenu) {
+    menuActions.classList.remove("hidden");
+    statusActions.classList.add("hidden");
+  } else {
+    menuActions.classList.add("hidden");
+    statusActions.classList.remove("hidden");
+  }
   overlay.classList.remove("hidden");
+}
+
+function setStatusButton(label) {
+  startBtn.textContent = label;
 }
 
 function hideOverlay() {
@@ -108,6 +142,21 @@ function setDirection(nextDir) {
   state.pendingDirection = nextDir;
 }
 
+function getLevelFromScore(score) {
+  return Math.floor(score / LEVEL_SCORE_STEP) + 1;
+}
+
+function getTickMs(level) {
+  const speed = BASE_TICK_MS - (level - 1) * 8;
+  return Math.max(MIN_TICK_MS, speed);
+}
+
+function updateSpeed() {
+  if (!state.timer) return;
+  clearInterval(state.timer);
+  state.timer = setInterval(step, getTickMs(state.level));
+}
+
 function step() {
   if (!state.running || state.paused || state.gameOver) return;
 
@@ -134,6 +183,11 @@ function step() {
   const newSnake = [next, ...state.snake];
   if (next.x === state.food.x && next.y === state.food.y) {
     state.score += 10;
+    const nextLevel = getLevelFromScore(state.score);
+    if (nextLevel !== state.level) {
+      state.level = nextLevel;
+      updateSpeed();
+    }
     state.food = spawnFood(newSnake);
   } else {
     newSnake.pop();
@@ -192,21 +246,22 @@ function draw() {
   drawSnake();
 }
 
-function startGame() {
+function startGame(startLevel = 1) {
   if (state.timer) clearInterval(state.timer);
-  resetState();
+  resetState(startLevel);
   state.running = true;
   state.paused = false;
   hideOverlay();
   draw();
-  state.timer = setInterval(step, TICK_MS);
+  state.timer = setInterval(step, getTickMs(state.level));
 }
 
 function togglePause() {
   if (!state.running || state.gameOver) return;
   state.paused = !state.paused;
   if (state.paused) {
-    setOverlay("Paused", "Press space or resume to continue.", false);
+    setStatusButton("Resume");
+    setOverlay("Paused", "Press space or resume to continue.");
   } else {
     hideOverlay();
   }
@@ -215,7 +270,8 @@ function togglePause() {
 function endGame() {
   state.gameOver = true;
   state.running = false;
-  setOverlay("Game Over", "Press restart to play again.", false);
+  setStatusButton("Restart");
+  setOverlay("Game Over", "Press restart to play again.");
 }
 
 function handleKey(event) {
@@ -223,7 +279,7 @@ function handleKey(event) {
   if (nextDir) {
     event.preventDefault();
     if (!state.running && !state.gameOver) {
-      startGame();
+      startGame(1);
     }
     setDirection(nextDir);
   } else if (event.key === " ") {
@@ -247,7 +303,7 @@ function handleControlClick(event) {
     right: { x: 1, y: 0 },
   };
   if (!state.running && !state.gameOver) {
-    startGame();
+    startGame(1);
   }
   setDirection(mapping[dir]);
 }
@@ -258,20 +314,53 @@ function handlePauseButton() {
 }
 
 function handleRestart() {
-  startGame();
+  startGame(1);
+}
+
+function handleNewGame() {
+  startGame(1);
+}
+
+function handleContinue() {
+  startGame(getBestLevel());
+}
+
+function handleResetProgress() {
+  localStorage.removeItem(bestScoreKey);
+  localStorage.removeItem(bestLevelKey);
+  bestEl.textContent = "0";
+  levelEl.textContent = "1";
+  scoreEl.textContent = "0";
+  setOverlay("Progress Reset", "Start a new game to play.", true);
+  updateMenuVisibility();
+}
+
+function updateMenuVisibility() {
+  const bestLevel = getBestLevel();
+  if (bestLevel > 1) {
+    continueBtn.disabled = false;
+    continueBtn.textContent = `Continue (Level ${bestLevel})`;
+  } else {
+    continueBtn.disabled = true;
+    continueBtn.textContent = "Continue";
+  }
 }
 
 function init() {
   board.width = GRID_SIZE * CELL_COUNT;
   board.height = GRID_SIZE * CELL_COUNT;
   bestEl.textContent = String(getBestScore());
-  resetState();
+  resetState(1);
   draw();
-  setOverlay("Press Start", "Use arrow keys or WASD.");
+  updateMenuVisibility();
+  setOverlay("Welcome Back", "Pick where you want to start.", true);
 
   document.addEventListener("keydown", handleKey);
   document.querySelector(".controls").addEventListener("click", handleControlClick);
-  startBtn.addEventListener("click", startGame);
+  startBtn.addEventListener("click", handleRestart);
+  newBtn.addEventListener("click", handleNewGame);
+  continueBtn.addEventListener("click", handleContinue);
+  resetBtn.addEventListener("click", handleResetProgress);
   pauseBtn.addEventListener("click", handlePauseButton);
   restartBtn.addEventListener("click", handleRestart);
 }

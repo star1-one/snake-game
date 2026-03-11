@@ -19,7 +19,11 @@
             <span id="score">0</span>
           </div>
           <div class="score">
-            <span class="label">Best</span>
+            <span class="label">Level</span>
+            <span id="level">1</span>
+          </div>
+          <div class="score">
+            <span class="label">High</span>
             <span id="best">0</span>
           </div>
         </div>
@@ -29,9 +33,16 @@
         <canvas id="board" width="480" height="480" aria-label="Snake board"></canvas>
         <div class="overlay" id="overlay" aria-live="polite">
           <div class="overlay-card">
-            <h2 id="overlay-title">Press Start</h2>
+            <h2 id="overlay-title">Classic Snake</h2>
             <p id="overlay-subtitle">Use arrow keys or WASD.</p>
-            <button id="start-btn" type="button">Start</button>
+            <div class="overlay-actions" id="menu-actions">
+              <button id="new-btn" type="button">New Game</button>
+              <button id="continue-btn" type="button">Continue</button>
+              <button id="reset-btn" type="button" class="secondary">Reset Progress</button>
+            </div>
+            <div class="overlay-actions hidden" id="status-actions">
+              <button id="start-btn" type="button">Start</button>
+            </div>
           </div>
         </div>
       </section>
