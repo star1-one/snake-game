@@ -31,17 +31,42 @@
 
       <section class="game">
         <canvas id="board" width="480" height="480" aria-label="Snake board"></canvas>
+        <div class="status-bar" id="status-bar">
+          <span class="status-label">Effect</span>
+          <span id="effect-name">None</span>
+          <span class="status-sep">•</span>
+          <span id="effect-timer">0s</span>
+        </div>
         <div class="overlay" id="overlay" aria-live="polite">
           <div class="overlay-card">
             <h2 id="overlay-title">Classic Snake</h2>
             <p id="overlay-subtitle">Use arrow keys or WASD.</p>
+            <p class="map-label">Map: <span id="map-name">Classic</span></p>
             <div class="overlay-actions" id="menu-actions">
               <button id="new-btn" type="button">New Game</button>
               <button id="continue-btn" type="button">Continue</button>
+              <button id="clear-leaderboard-btn" type="button" class="secondary">
+                Clear Leaderboard
+              </button>
               <button id="reset-btn" type="button" class="secondary">Reset Progress</button>
+            </div>
+            <div class="skin-picker">
+              <h3>Snake Skin</h3>
+              <div class="skin-preview" id="skin-preview">
+                <span class="segment"></span>
+                <span class="segment"></span>
+                <span class="segment"></span>
+              </div>
+              <div class="skin-options" id="skin-options"></div>
             </div>
             <div class="overlay-actions hidden" id="status-actions">
               <button id="start-btn" type="button">Start</button>
+            </div>
+            <div class="overlay-leaderboard">
+              <h3>Leaderboard</h3>
+              <ol id="leaderboard-list">
+                <li>No scores yet.</li>
+              </ol>
             </div>
           </div>
         </div>
