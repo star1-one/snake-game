@@ -463,7 +463,6 @@ function updateMovingObstacles() {
     }
   });
 }
-}
 
 function ensureAudio() {
   if (audio.context) return;
