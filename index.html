@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Classic Snake</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="header">
+        <div>
+          <h1>Classic Snake</h1>
+          <p>Arrow keys or WASD to move. Space to pause.</p>
+        </div>
+        <div class="scoreboard">
+          <div class="score">
+            <span class="label">Score</span>
+            <span id="score">0</span>
+          </div>
+          <div class="score">
+            <span class="label">Best</span>
+            <span id="best">0</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="game">
+        <canvas id="board" width="480" height="480" aria-label="Snake board"></canvas>
+        <div class="overlay" id="overlay" aria-live="polite">
+          <div class="overlay-card">
+            <h2 id="overlay-title">Press Start</h2>
+            <p id="overlay-subtitle">Use arrow keys or WASD.</p>
+            <button id="start-btn" type="button">Start</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="On screen controls">
+        <div class="control-row">
+          <button class="control" data-dir="up" aria-label="Move up">▲</button>
+        </div>
+        <div class="control-row">
+          <button class="control" data-dir="left" aria-label="Move left">◀</button>
+          <button class="control" data-dir="down" aria-label="Move down">▼</button>
+          <button class="control" data-dir="right" aria-label="Move right">▶</button>
+        </div>
+        <div class="control-row">
+          <button class="control action" id="pause-btn" type="button">Pause</button>
+          <button class="control action" id="restart-btn" type="button">Restart</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

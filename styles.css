@@ -1,0 +1,179 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f4ef;
+  --text: #1b1a17;
+  --muted: #6e6b65;
+  --panel: #ffffff;
+  --accent: #2f6b3c;
+  --accent-dark: #1f4a29;
+  --grid: #e7e3da;
+  --snake: #1f4a29;
+  --food: #d74b4b;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #fff8ec, var(--bg));
+  color: var(--text);
+}
+
+.app {
+  max-width: 720px;
+  margin: 32px auto 40px;
+  padding: 0 20px 30px;
+}
+
+.header {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  margin: 0 0 6px;
+  font-size: 1.9rem;
+}
+
+.header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.scoreboard {
+  display: flex;
+  gap: 16px;
+}
+
+.score {
+  background: var(--panel);
+  padding: 10px 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  min-width: 90px;
+  text-align: center;
+}
+
+.score .label {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.score span {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.game {
+  position: relative;
+  background: var(--panel);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+#board {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: #faf8f4;
+  display: block;
+  border: 1px solid var(--grid);
+}
+
+.overlay {
+  position: absolute;
+  inset: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 248, 236, 0.75);
+  border-radius: 12px;
+  transition: opacity 0.2s ease;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay-card {
+  background: var(--panel);
+  padding: 24px 28px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  max-width: 260px;
+}
+
+.overlay-card h2 {
+  margin: 0 0 10px;
+}
+
+.overlay-card p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.overlay-card button {
+  border: none;
+  background: var(--accent);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.controls {
+  margin-top: 18px;
+  display: grid;
+  gap: 12px;
+  justify-content: center;
+}
+
+.control-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.control {
+  border: 1px solid var(--grid);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 1.1rem;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.control.action {
+  width: auto;
+  padding: 0 16px;
+  font-size: 0.95rem;
+}
+
+.control:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+@media (min-width: 680px) {
+  .controls {
+    display: none;
+  }
+}
